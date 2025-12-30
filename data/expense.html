@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title> Expenses | Lorgarts Gas</title>
+  <link rel="stylesheet" href="../plugins/toastr/toastr.min.css">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+  <link rel="stylesheet" href="../plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
+  <link rel="stylesheet" href="../dist/css/adminlte.min.css">
+
+  <!-- Select2 -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="../plugins/bootstrap/js/bootstrap.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+
+
+    function viewDay() {
+      var location = $("#selectid").val();
+      var date = $('#day_date').val().split("-");
+
+      day = date[2];
+      month = date[1];
+      year = date[0];
+      type = "day";
+      data(location, year, month, day, type)
+    }
+
+    function selectDate2() {
+      var strUser = $("#selectdate").val();
+      $("#productsort").prop('selectedIndex', 0);
+      if (strUser == "Day") {
+        $("#day_div").show();
+        $("#day_div2").hide()
+      } else if (strUser == "Range") {
+        $("#day_div").show();
+        $("#day_div2").show();
+      } else {
+        $("#day_div").hide();
+        $("#day_div2").hide();
+
+        let xhr = new XMLHttpRequest();
+        xhr.open("GET", "http://worldtimeapi.org/api/timezone/Africa/Lagos");
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState === 4) {
+            let onlinetime = JSON.parse(xhr.responseText).datetime.substring(0, 19).split("T")[0];
+            let parts = onlinetime.split('-');
+            var currenttime = new Date(parts[0], parts[1] - 1, parts[2]);
+
+            if (strUser == "Yesterday") {
+              currenttime.setDate(currenttime.getDate() - 1);
+            }
+            var location = $("#selectid").val();
+            var day = currenttime.getDate();
+            var mont = currenttime.getMonth() + 1;
+            var yr = currenttime.getFullYear();
+            var type = "All";
+
+            data(location, yr, mont, day, type);
+          }
+        };
+        xhr.send();
+      }
+    }
+
+
+
+
+
+    function data(location, yr, mont, day, type) {
+      $.ajax({
+        type: "POST",
+        url: "https://lorgartsgas.hotelsoft.ng/php/get_expense.php",
+        data: {
+          location: location,
+          yr: yr,
+          mont: mont,
+          day: day,
+          type: type
+        },
+
+        dataType: "json",
+        // beforeSend: function () {
+        //   $(".overlay").show();
+        // },
+        complete: function () {
+          $(".overlay").hide();
+        },
+        success: function (response) {
+          $('#userinfo').DataTable({
+            "bAutoWidth": false,
+            "bDestroy": true,
+            "aaData": response,
+
+            "columns": [{
+              "data": "cnt"
+            },
+            {
+              "data": "type"
+            },
+            {
+              "data": "price"
+            }, {
+              "data": "description"
+            },
+            {
+              "data": "datetime"
+            },
+            {
+              "data": "name"
+            }
+
+            ],
+            "searching": false,
+            "footerCallback": function (row, data, start, end, display) {
+              var api = this.api(),
+                data;
+
+              // converting to interger to find total
+              var intVal = function (i) {
+                return typeof i === 'string' ?
+                  i.replace(/[\$,]/g, '') * 1 :
+                  typeof i === 'number' ?
+                    i : 0;
+              };
+
+              // computing column Total of the complete result 
+
+
+              var tueTotal = api
+                .column(2)
+                .data()
+                .reduce(function (a, b) {
+                  return intVal(a) + intVal(b);
+                }, 0);
+
+              // Update footer by showing the total with the reference of the column index 
+
+              $(api.column(2).footer()).html(tueTotal);
+            },
+            "buttons": [{
+              extend: 'copyHtml5',
+              footer: true
+            },
+            {
+              extend: 'print',
+              footer: true
+            },
+            {
+              extend: 'excelHtml5',
+              footer: true
+            },
+            {
+              extend: 'csvHtml5',
+              footer: true
+            },
+            {
+              extend: 'pdfHtml5',
+              footer: true
+            }
+            ]
+          }).buttons().container().appendTo('#userinfo_wrapper .col-md-6:eq(1)');
+        }
+      });
+    }
+
+    function fillLocationData() {
+      let currentDate = new Date(); // Get the current local date and time
+
+      let day = String(currentDate.getDate()).padStart(2, '0'); // Day with leading zero
+      let month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Month with leading zero (0-based index)
+      let year = currentDate.getFullYear(); // Full year
+
+      let type = "All";
+      // let location = $("#selectid").val();
+      // $("#loc").val(location);
+      data("10", year, month, day, type);
+      //sessionStorage.setItem('location', location);
+    }
+
+  </script>
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed text-sm">
+  <!-- Site wrapper -->
+  <div class="wrapper">
+
+    <nav class="main-header navbar navbar-expand navbar-light">
+      <!-- Left navbar links -->
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-toggle="modal" data-target="#sell-modal"><img src="img/sell.png"
+              style="width:60px;cursor:pointer"></a>
+        </li>
+
+        <!--<li class="nav-item d-none d-sm-inline-block">-->
+        <!--  <a href="#" class="nav-link">Contact</a>-->
+        <!--</li>-->
+      </ul>
+
+      <!-- Right navbar links -->
+      <ul class="navbar-nav ml-auto text-sm">
+        <li class="nav-item">
+          <button class="sales-button nav-link" style="color:white" onclick="window.location.href='sales.html'"> Sales
+          </button>
+
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="calc" href="#" role="button" data-toggle="modal" title="Calculator"
+            data-target="#modal-calculator">
+            <i class="fas fa-calculator"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-widget="fullscreen" title="Fullscreen" href="#" role="button">
+            <i class="fas fa-expand-arrows-alt"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="outa.php" title="Logout" onclick="return confirm('Do you want to logout?')">
+            <i class="fas fa-sign-out-alt"></i>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <aside id="sidebar-container" class="main-sidebar sidebar-dark-primary elevation-4 text-sm"></aside>
+    <!-- /.sidebar -->
+
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-sm-6">
+              <h1>Expenses</h1>
+            </div>
+            <div class="col-sm-6">
+              <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item active">Expenses</li>
+              </ol>
+            </div>
+          </div>
+        </div><!-- /.container-fluid -->
+      </section>
+      <!-- <?php include('container_fluid.php'); ?> -->
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="card card-primary card-outline">
+              <div class="card-header  id_100">
+
+
+
+                <div class="card-tools"><button type="button" id="addexpensebtn" style="margin-left: 1em;"
+                    class="btn btn-info"><i class="fas fa-plus"></i> Add Expense</button></div>
+
+
+                <div class="card-tools" style="margin-left: 1em;display:none" id="day_div2">
+                  <input type="date" class="form-control" id="day_date2">
+                </div>
+                <div class="card-tools" style="margin-left: 1em;display:none" id="day_div" onchange="viewDay()">
+                  <input type="date" class="form-control" id="day_date">
+                </div>
+                <div class="card-tools">
+                  <select class="form-control custom-select" required id="selectdate" onchange="selectDate2()">
+                    <option value="All" selected>All</option>
+                  </select>
+                </div>
+                <div class="card-tools" style="margin-right: 1em; margin-top: 0.5em;">
+                  Sort :
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Main content -->
+      <section class="content">
+
+        <div class="card">
+          <!-- <div class="card-header">
+            <h3 class="card-title" id="huy">Pump Sales</h3>
+          </div> -->
+          <!-- /.card-header -->
+          <div class="card-body">
+            <table id="userinfo" class="table table-bordered table-striped  table-responsive">
+              <thead>
+                <tr>
+                  <th style="width: 10%"> # </th>
+                  <th style="text-align: center;"> Expense Type </th>
+                  <th style="text-align: center;"> Amount </th>
+                  <th style="text-align: center;">Description</th>
+                  <th style="text-align: center;">Date/Time</th>
+                  <th style="text-align: center;">User</th>
+                </tr>
+              </thead>
+              <tfoot>
+                <tr>
+                  <th style="text-align: center">Totals </th>
+                  <th style="text-align: right;"> </th>
+                  <th style="text-align: center"> </th>
+                  <th style="text-align: center"> </th>
+                  <th style="text-align: center"> </th>
+                  <th style="text-align: center"> </th>
+                </tr>
+              </tfoot>
+
+            </table>
+          </div>
+          <!-- /.card-body -->
+        </div>
+
+      </section>
+      <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+    <div class="modal fade" id="modal-esp">
+      <div class="modal-dialog">
+        <div class="modal-content">
+
+        </div>
+        <!-- /.modal-content -->
+      </div>
+      <!-- /.modal-dialog -->
+    </div>
+
+    <div class="modal fade" id="modal-updateexpense">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form id="addexpense">
+            <div class="modal-header">
+              <h4 class="modal-title">Add Expense</h4>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+
+            <div class="modal-body">
+              <div class="col-md-12">
+                <div class="card card-primary">
+
+                  <div class="card-body">
+                    <div class="form-group">
+                      <label for="inputName">Expense Type</label>
+                      <input type="text" id="eetype" name="etype" required class="form-control">
+                    </div>
+                    <div class="form-group">
+                      <label for="inputName">Amount</label>
+                      <input type="text" id="eamt" name="eamt" required class="form-control">
+                    </div>
+
+
+                    <div class="form-group">
+                      <label for="inputName">Description</label>
+                      <textarea id="edesc" name="edesc" required class="form-control"></textarea>
+                    </div>
+                    <input type="hidden" id="eid" name="eid">
+
+
+                  </div>
+                  <!-- /.card-body -->
+
+                </div>
+                <!-- /.card -->
+              </div>
+            </div>
+            <div class="modal-footer justify-content-between">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              <button type="submit" name="submit" class="btn btn-primary">Save</button>
+            </div>
+          </form>
+        </div>
+        <!-- /.modal-content -->
+      </div>
+      <!-- /.modal-dialog -->
+    </div>
+
+    <div class="modal fade" id="deleteEModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form method="post" action="deleteExpense.php">
+
+            <div class="modal-header">
+              <h4 class="modal-title">Delete</h4>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <p style="text-align: center;">Do you want to delete expense? </p>
+            <input type="hidden" id="eidd" name="eidd">
+
+            <div class="modal-footer justify-content-between">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+              <button type="submit" name="submit" class="btn btn-primary">Yes</button>
+            </div>
+          </form>
+        </div>
+        <!-- /.modal-content -->
+      </div>
+    </div>
+
+
+
+
+    <div class="modal fade" id="sell-modal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form method="post" id="sellform">
+            <div class="modal-header">
+              <h4 class="modal-title">Sell</h4>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+
+            <div class="modal-body">
+              <div class="col-md-12">
+                <div class="card card-primary">
+
+                  <div class="card-body">
+
+                    <div class="form-group">
+                      <label for="inputName">Customer</label>
+                      <select class="form-control" name="customer" id="customer">
+                        <option value="">--select customer--</option>
+                      </select>
+
+                    </div>
+
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group">
+                          <label for="inputName"> Date</label>
+                          <input type="datetime-local" id="selldate" name="selldate" required class="form-control">
+                        </div>
+
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group">
+                          <label for="inputName"> Quantity (Kg)</label>
+                          <input type="number" step="0.01" id="lpg_qty" name="lpg_qty" onkeyup="handleKeyUp(event)"
+                            required class="form-control">
+                        </div>
+                      </div>
+                    </div>
+                    <input type="hidden" id="hiddenid" name="hiddenid" value="">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label for="inputName"> Total Price </label>
+                          <input type="text" id="lpg_price" onkeyup="handlePriceKeyUp(event)" name="lpg_price"
+                            class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label for="inputName"> Paid Via</label>
+                          <select class="form-control" required name="pvia" id="pvia" onchange="showSelAcc(event)">
+                            <option value="">--select--</option>
+                            <option value="Cash">Cash</option>
+                            <option value="Transfer"> Bank Transfer</option>
+                            <option value="POS">POS</option>
+                            <option value="Unpaid">Unpaid</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div class="col-md-12" id="sel_accdiv" style="display: none;">
+                        <div class="form-group">
+                          <label for="inputName"> Select Account</label>
+                          <select class="form-control" name="sel_acc" id="sel_acc">
+                            <option value="">--select--</option>
+                          </select>
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- /.card-body -->
+
+                </div>
+                <!-- /.card -->
+              </div>
+            </div>
+            <div class="modal-footer justify-content-between" style="padding-top: 0px; margin-top:0px">
+              <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+              <button type="submit" id="selsubmit" name="submit" class="btn btn-primary">Submit</button>
+            </div>
+          </form>
+        </div>
+        <!-- /.modal-content -->
+      </div>
+      <!-- /.modal-dialog -->
+    </div>
+    <footer class="main-footer">
+      <div class="float-right d-none d-sm-block">
+        <!--<b>Version</b> 1.0-->
+      </div>
+      <strong>Copyright &copy;
+        <span id="footerdate"></span> <a href="index.html">Lorgarts Gas</a>.
+      </strong> All rights reserved.
+    </footer>
+
+    <!-- Control Sidebar -->
+    <aside class="control-sidebar control-sidebar-dark">
+      <!-- Control sidebar content goes here -->
+    </aside>
+    <!-- /.control-sidebar -->
+  </div>
+  <!-- ./wrapper -->
+
+
+  <script>
+    $(document).ready(function () {
+      $("#day_div").hide();
+      $("#day_div2").hide();
+    });
+  </script>
+
+  <script src="../plugins/jquery/jquery.min.js"></script>
+  <script src="../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
+  <script src="../plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+  <script src="../plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+  <script src="../plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+  <script src="../plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+  <script src="../plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+  <script src="../plugins/jszip/jszip.min.js"></script>
+  <script src="../plugins/pdfmake/pdfmake.min.js"></script>
+  <script src="../plugins/pdfmake/vfs_fonts.js"></script>
+  <script src="../plugins/datatables-buttons/js/buttons.html5.min.js"></script>
+  <script src="../plugins/datatables-buttons/js/buttons.print.min.js"></script>
+  <script src="../plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
+  <script src="../dist/js/adminlte.min.js"></script>
+
+  <script src="../plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
+  <script>
+    $('.table').on('click', 'tbody tr', function (event) {
+      $(this).addClass('highlight').siblings().removeClass('highlight');
+    })
+  </script>
+  <script>
+    $(function () {
+      fillLocationData();
+
+
+    });
+    // $(document).on("click", '.editbtn', function (event) {
+
+    //   $('#modal-updateexpense').modal('show');
+    //   $tr = $(this).closest('tr');
+    //   var data = $tr.children("td").map(function () {
+    //     return $(this).text();
+    //   }).get();
+    //   $('#eamt').val(data[2].trim());
+    //   $('#edesc').val(data[3].trim());
+    //   $("#eetype option:contains(" + data[1].trim() + ")").attr('selected', 'selected');
+    //   var currentRow = $(this).closest("tr");
+    //   var dataa = $('#userinfo').DataTable().row(currentRow).data();
+    //   $('#eid').val(dataa['uid']);
+    // });
+
+    $("#addexpensebtn").on('click', function () {
+      $('#modal-updateexpense').modal('show');
+    });
+
+
+    $(document).on('submit', '#addexpense', function (e) {
+      e.preventDefault();
+
+      const form = $(this);
+
+      $.ajax({
+        url: 'https://lorgartsgas.hotelsoft.ng/php/add_expense.php',
+        type: 'POST',
+        data: form.serialize(),
+        dataType: 'json',
+        beforeSend: function () {
+          form.find('button[type="submit"]')
+            .prop('disabled', true)
+            .text('Saving...');
+        },
+        success: function (res) {
+          if (res.status === 'success') {
+            $('#modal-updateexpense').modal('hide');
+            form[0].reset();
+
+            // Reload expense table
+            loadExpenses(); // your AJAX reload function
+
+            alert(res.message);
+          } else {
+            alert(res.message);
+          }
+        },
+        error: function () {
+          alert('Server error. Please try again.');
+        },
+        complete: function () {
+          form.find('button[type="submit"]')
+            .prop('disabled', false)
+            .text('Save');
+        }
+      });
+    });
+
+
+
+    // $(document).on("change", '#edate', function (event) {
+    //   let pid = $("#edate").val();
+    //   $.ajax({
+    //     type: "POST",
+    //     url: "https://lorgartsgas.hotelsoft.ng/php/get_usersalesdate.php",
+    //     data: {
+    //       pid: pid
+    //     },
+    //     dataType: "html",
+    //     success: function (response) {
+
+    //       $("#spumpdiv").html(response);
+    //     }
+    //   });
+    // });
+
+
+
+    // $(document).on("change", '#etype', function (event) {
+    //   let fg = $("#etype option:selected").val();
+
+    //   if (fg == "4") {
+    //     $('#descr').show();
+    //     $('#edesc').attr('required', 'required');
+    //   } else {
+    //     $('#descr').hide();
+    //     $('#edesc').removeAttr('required');
+    //   }
+
+    //   if (fg == "1" || fg == "2" || fg == "3") {
+    //     $('#truckdiv').show();
+    //     $('#etruck').attr('required', 'required');
+    //   } else {
+    //     $('#truckdiv').hide();
+    //     $("#etruck").prop('selectedIndex', 0);
+    //     $('#etruck').removeAttr('required');
+    //   }
+    //   if (fg == "3" || fg == "5") {
+    //     $('#spumpdiv').show();
+    //     $('#spump').attr('required', 'required');
+    //   } else {
+    //     $('#spumpdiv').hide();
+    //     $('#spump').removeAttr('required');
+    //   }
+
+    // });
+
+    // $(document).on("click", '.deletebtn', function (event) {
+    //   $('#deleteEModal').modal('show');
+    //   var currentRow = $(this).closest("tr");
+    //   var dataa = $('#userinfo').DataTable().row(currentRow).data();
+    //   $('#eidd').val(dataa['uid']);
+    // });
+  </script>
+  <script src="footer.js"></script>
+
+</body>
+
+</html>

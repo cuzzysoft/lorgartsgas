@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Unpaid | Lorgarts Gas</title>
+    <link rel="stylesheet" href="../plugins/toastr/toastr.min.css">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link rel="stylesheet" href="../plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
+    <link rel="stylesheet" href="../dist/css/adminlte.min.css">
+
+    <!-- Select2 -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../plugins/bootstrap/js/bootstrap.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+
+
+
+        function data(location, yr, mont, day, type) {
+            $.ajax({
+                type: "POST",
+                url: "https://lorgartsgas.hotelsoft.ng/php/get_unpaid.php",
+                data: {
+                    location: 'location',
+                    yr: 'yr',
+                    mont: 'mont',
+                    day: 'day',
+                    type: 'type'
+                },
+                dataType: "json",
+                beforeSend: function () {
+                    $(".overlay").show();
+                },
+                complete: function () {
+                    $(".overlay").hide();
+                },
+
+                success: function (response) {
+
+                    $('#userinfo').DataTable({
+                        "bAutoWidth": false,
+                        "bDestroy": true,
+                        bFilter: true,
+                        "pageLength": 25,
+                        "aaData": response,
+
+                        "columns": [{
+                            "data": "cnt"
+                        }, {
+                            "data": "product"
+                        }, {
+                            "data": "qty"
+                        }, {
+                            "data": "price"
+                        },
+                        {
+                            "data": "pvia"
+                        },
+                        {
+                            "data": "dte"
+                        },
+
+                        {
+                            "data": "buyer"
+                        },
+                        {
+                            "data": "inv",
+
+                        }
+
+                        ],
+                        processing: true,
+                       
+                        "buttons": [
+                            {
+                                extend: 'print',
+                                footer: true
+                            },
+                            {
+                                extend: 'excelHtml5',
+                                footer: true
+                            }
+                        ]
+                    }).buttons().container().appendTo('#userinfo_wrapper .col-md-6:eq(1)');
+
+
+                }
+            });
+
+
+
+        }
+        function fillLocationData() {
+            let currentDate = new Date();
+            let day = String(currentDate.getDate()).padStart(2, '0');
+            let month = String(currentDate.getMonth() + 1).padStart(2, '0');
+            let year = currentDate.getFullYear();
+
+            let type = "All";
+            data("10", year, month, day, type);
+        }
+
+
+    </script>
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed text-sm">
+    <!-- Site wrapper -->
+    <div class="wrapper">
+        <nav class="main-header navbar navbar-expand navbar-light">
+            <!-- Left navbar links -->
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="modal" data-target="#sell-modal"><img src="img/sell.png"
+                            style="width:60px;cursor:pointer"></a>
+                </li>
+
+                <!--<li class="nav-item d-none d-sm-inline-block">-->
+                <!--  <a href="#" class="nav-link">Contact</a>-->
+                <!--</li>-->
+            </ul>
+
+            <!-- Right navbar links -->
+            <ul class="navbar-nav ml-auto text-sm">
+                <li class="nav-item">
+                    <button class="sales-button nav-link" style="color:white"
+                        onclick="window.location.href='sales.html'"> Sales
+                    </button>
+
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="calc" href="#" role="button" data-toggle="modal" title="Calculator"
+                        data-target="#modal-calculator">
+                        <i class="fas fa-calculator"></i>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="fullscreen" title="Fullscreen" href="#" role="button">
+                        <i class="fas fa-expand-arrows-alt"></i>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="outa.php" title="Logout"
+                        onclick="return confirm('Do you want to logout?')">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <aside id="sidebar-container" class="main-sidebar sidebar-dark-primary elevation-4 text-sm"></aside>
+        <!-- /.sidebar -->
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            <!-- Content Header (Page header) -->
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1 id="psaleH">Unpaid Sales</h1>
+                        </div>
+                        <div class="col-sm-4">
+
+                        </div>
+
+                    </div>
+                </div><!-- /.container-fluid -->
+            </section>
+
+            <!-- Main content -->
+            <div class="container-fluid" style="display:none">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card card-primary card-outline">
+                            <div class="card-header  id_100">
+
+
+
+                                <div class="card-tools">
+                                    <select class="form-control custom-select" onchange="viewShow()" id="productsort">
+                                        <option value="All" selected>All</option>
+                                        <option value="PMS">PMS</option>
+                                        <option value="AGO">AGO</option>
+                                        <option value="DPK">DPK</option>
+                                    </select>
+                                </div>
+                                <div class="card-tools"
+                                    style="margin-left: 1em; margin-right: 0.2em;margin-top: 0.5em;">
+                                    Show :
+                                </div>
+
+                                <div class="card-tools" style="margin-left: 1em;display:none" id="day_div2">
+                                    <input type="date" class="form-control" id="day_date2">
+                                </div>
+                                <div class="card-tools" style="margin-left: 1em;display:none" id="day_div"
+                                    onchange="viewDay()">
+                                    <input type="date" class="form-control" id="day_date">
+                                </div>
+                                <div class="card-tools">
+                                    <select class="form-control custom-select" required id="selectdate"
+                                        onchange="selectDate2()">
+                                        <option value="Today" selected>Today</option>
+                                        <option value="Yesterday">Yesterday</option>
+                                        <option value="Day">Day</option>
+                                        <option value="Range">Range</option>
+                                    </select>
+                                </div>
+                                <div class="card-tools" style="margin-right: 1em; margin-top: 0.5em;">
+                                    Sort :
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <section class="content">
+
+                <div class="card">
+                    <div class="card-body table-responsive ">
+
+                        <table id="userinfo" class="table table-bordered table-striped ">
+                            <thead>
+                                <tr>
+                                    <th style="width: 2em;text-align: center"> # </th>
+                                    <th style="text-align: center"> Product </th>
+                                    <th style="text-align: center"> Quantity </th>
+                                    <th style="text-align: center"> Price </th>
+                                    <th style="text-align: center"> Paid Via </th>
+                                    <th style="text-align: center"> Sale Date </th>
+                                    <th style="text-align: center">Buyer </th>
+                                    <th style="text-align: center">Invoice </th>
+                                </tr>
+                            </thead>
+                            <!--<tfoot>-->
+                            <!--    <tr>-->
+                            <!--        <th style="width: 2em;text-align: center"> Total </th>-->
+                            <!--        <th style="text-align: center"> </th>-->
+                            <!--        <th style="text-align: center"> </th>-->
+                            <!--        <th style="text-align: center"> </th>-->
+                            <!--        <th style="text-align: center"> </th>-->
+                            <!--        <th style="text-align: center"> </th>-->
+                            <!--        <th style="text-align: center"> </th>-->
+                            <!--        <th style="text-align: center"> </th>-->
+                            <!--        <th style="text-align: center"> </th>-->
+                            <!--    </tr>-->
+                            <!--</tfoot>-->
+
+                        </table>
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+
+
+            </section>
+            <div class="modal fade" id="modal-sales">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                        <form method="post" action="" id="form">
+                            <div class="modal-header">
+                                <h4 class="modal-title">Invoice</h4>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+
+                            <div class="modal-body">
+                                <div class="col-md-12">
+                                    <div class="card card-primary">
+
+                                        <div class="card-body" id="modbody">
+                                            <div style="text-align:center">
+                                                <img src="img/logo.png" style="width:3em">
+                                                <h4>LORGARTS COOKING GAS</h4>
+                                                <p>Agba, Ekwulobia.<br> 09032671561<br>
+                                                    Date: <span id="date">24th Jun, 2O24 11:09AM</span> </p>
+                                                <hr>
+                                            </div>
+
+
+                                            <div class="form-group">
+                                                <p>Description: Cooking Gas (LPG) purchase</p>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <p> Quantity: <span id="qtyy"></span></p>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <p> Price: <span id="pricee"></span></p>
+                                            </div>
+                                            <div class="form-group">
+                                                <p> Status: <span id="pstat"></span></p>
+                                            </div>
+                                            <p style="text-align:right">User: Daberechukwu Promise</p>
+                                            <div style="text-align:center">Thanks for your patronage</div>
+                                        </div>
+                                        <!-- /.card-body -->
+
+                                    </div>
+                                    <!-- /.card -->
+                                </div>
+                            </div>
+                            <div class="modal-footer justify-content-between">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="submit" id="savebtn" name="submit" class="btn btn-primary">Print</button>
+                            </div>
+                        </form>
+                    </div>
+                    <!-- /.modal-content -->
+                </div>
+                <!-- /.modal-dialog -->
+            </div>
+        </div>
+        <!-- /.content-wrapper -->
+
+        <footer class="main-footer">
+            <div class="float-right d-none d-sm-block">
+                <!--<b>Version</b> 1.0-->
+            </div>
+            <strong>Copyright &copy;
+                <span id="footerdate"></span> <a href="index.html">Lorgarts Gas</a>.
+            </strong> All rights reserved.
+        </footer>
+
+        <!-- Control Sidebar -->
+        <aside class="control-sidebar control-sidebar-dark">
+            <!-- Control sidebar content goes here -->
+        </aside>
+        <!-- /.control-sidebar -->
+    </div>
+
+     <div class="modal fade" id="sell-modal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form method="post" id="sellform">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Sell</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        <div class="modal-body">
+                            <div class="col-md-12">
+                                <div class="card card-primary">
+
+                                    <div class="card-body">
+
+                                        <div class="form-group">
+                                            <label for="inputName">Customer</label>
+                                            <select class="form-control" name="customer" id="customer">
+                                                <option value="">--select customer--</option>
+                                            </select>
+
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label for="inputName"> Date</label>
+                                                    <input type="datetime-local" id="selldate" name="selldate" required
+                                                        class="form-control">
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label for="inputName"> Quantity (Kg)</label>
+                                                    <input type="number" step="0.01" id="lpg_qty" name="lpg_qty"
+                                                        onkeyup="handleKeyUp(event)" required class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <input type="hidden" id="hiddenid" name="hiddenid" value="">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="inputName"> Total Price </label>
+                                                    <input type="text" id="lpg_price" onkeyup="handlePriceKeyUp(event)"
+                                                        name="lpg_price" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="inputName"> Paid Via</label>
+                                                    <select class="form-control" required name="pvia" id="pvia"
+                                                        onchange="showSelAcc(event)">
+                                                        <option value="">--select--</option>
+                                                        <option value="Cash">Cash</option>
+                                                        <option value="Transfer"> Bank Transfer</option>
+                                                        <option value="POS">POS</option>
+                                                        <option value="Unpaid">Unpaid</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-12" id="sel_accdiv" style="display: none;">
+                                                <div class="form-group">
+                                                    <label for="inputName"> Select Account</label>
+                                                    <select class="form-control" name="sel_acc" id="sel_acc">
+                                                        <option value="">--select--</option>
+                                                    </select>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- /.card-body -->
+
+                                </div>
+                                <!-- /.card -->
+                            </div>
+                        </div>
+                        <div class="modal-footer justify-content-between" style="padding-top: 0px; margin-top:0px">
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                            <button type="submit" id="selsubmit" name="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+    <!-- ./wrapper -->
+
+    <script>
+
+        $("#day_div").hide();
+        $("#day_div2").hide();
+
+    </script>
+
+
+    <script>
+        $(function () {
+            fillLocationData();
+
+            // if (sessionStorage.getItem('type') == null) {
+
+            // } else if(sessionStorage.getItem('type') == "yesterday") {
+            //     $("#selectid").val(sessionStorage.getItem('location')).change();
+            // }else if(sessionStorage.getItem('type') == "day") {
+            //     $("#selectid").val(sessionStorage.getItem('location')).change();
+            // }
+
+            $('#userinfo').on('click', 'tbody tr', function (event) {
+                $(this).addClass('highlight').siblings().removeClass('highlight');
+            })
+
+            $('#userinfo').on('click', '.editbtn', function (event) {
+
+                $('#modal-sales').modal('show');
+                var id = $(this).data("id");
+
+                $tr = $(this).closest('tr');
+
+                var data = $tr.children("td").map(function () {
+                    return $(this).text();
+                }).get();
+
+
+                var data = $('#userinfo').DataTable().row($tr).data();
+                console.log(data['paid_via']);
+                $('#date').text(data['dte']);
+                $('#qtyy').text(data['qty']);
+                $('#pricee').text(data['price']);
+                $('#pstat').text(data['pvia'] == "Unpaid" ? "UNPAID" : "PAID");
+            });
+
+
+            $('#sell-modal').on('hidden.bs.modal', function () {
+                $('#hiddenid').val("");
+                $("#selsubmit").text("Submit");
+            });
+
+            $('#userinfo').on('click', '.editsalesbtn', function (event) {
+
+                $('#sell-modal').modal('show');
+
+                $tr = $(this).closest('tr');
+
+                $("#selsubmit").text("Update");
+                var data = $('#userinfo').DataTable().row($tr).data();
+
+                let rawDate = new Date(data['date']);
+                let formattedDate = rawDate.toISOString().slice(0, 16);
+                $('#selldate').val(formattedDate);
+
+                $('#lpg_qty').val(data['qty'].replace("Kg", ""));
+                $('#lpg_price').val(data['price']);
+                $('#pvia').val(data['pvia']);
+                $('#hiddenid').val(data['id']);
+            });
+
+
+            function printModal() {
+                var modalContent = document.querySelector('#modbody').innerHTML; // Get modal body content
+                var printWindow = window.open('', '', 'height=600,width=800'); // Open new window for printing
+
+                printWindow.document.write('<html><head><title>Print Modal Content</title>');
+                printWindow.document.write('<style>body{font-family: Arial, sans-serif;font-size:12px;}</style>'); // Optional: add some styling for print
+                printWindow.document.write('</head><body>');
+                printWindow.document.write(modalContent); // Write the modal content into the print window
+                printWindow.document.write('</body></html>');
+
+                printWindow.document.close(); // Close the document for printing
+                printWindow.print(); // Trigger the print dialog
+            }
+
+
+
+            $('#form').on('submit', function (e) {
+                e.preventDefault(); //prevents page refresh when form is submitted
+
+                printModal();
+
+            });
+
+        });
+    </script>
+    <script src="../plugins/jquery/jquery.min.js"></script>
+    <script src="../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="../plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="../plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="../plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+    <script src="../plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="../plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+    <script src="../plugins/jszip/jszip.min.js"></script>
+    <script src="../plugins/pdfmake/pdfmake.min.js"></script>
+    <script src="../plugins/pdfmake/vfs_fonts.js"></script>
+    <script src="../plugins/datatables-buttons/js/buttons.html5.min.js"></script>
+    <script src="../plugins/datatables-buttons/js/buttons.print.min.js"></script>
+    <script src="../plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
+    <script src="../dist/js/adminlte.min.js"></script>
+    <!--<script src="../dist/js/demo.js"></script>-->
+    <script src="../plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
+    <script src="../plugins/toastr/toastr.min.js"></script>
+    <script src="footer.js"></script>
+</body>
+
+</html>

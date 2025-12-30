@@ -1,0 +1,390 @@
+<link href="../calc/style.css" rel="stylesheet">
+<script src="../calc/script.js" defer></script>
+
+
+<style>
+    .sales-button {
+        background-color: #4CAF50;
+        /* Green background */
+        color: white;
+        /* White text */
+        padding: 10px 15px;
+        /* Padding for size */
+        font-size: 14px;
+        /* Font size */
+        border: none;
+        /* No border */
+        border-radius: 5px;
+        /* Rounded corners */
+        cursor: pointer;
+        /* Pointer cursor on hover */
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        /* Smooth effects */
+    }
+
+    .sales-button:hover {
+        color: white;
+        background-color: #45a049;
+        /* Slightly darker green on hover */
+        transform: scale(1.05);
+        /* Slight enlargement on hover */
+    }
+
+    .sales-button:active {
+        color: white;
+        background-color: #3e8e41;
+        /* Darker green when pressed */
+    }
+</style>
+
+
+    <!-- Brand Logo -->
+    <!--<a href="index.php" >-->
+    <a href="index.html" style="decoration:none">
+        <div style=" margin-top:1em">
+            <img src="img/logo.png" alt="Lorgarts Gas Logo" class="brand-image " style="width: 3.6em;">
+            <span class="font-weight-bold" style="color:white; font-size:1.8em">Lorgarts Gas</span>
+        </div>
+    </a>
+    <!--</a>-->
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <!-- Sidebar user panel (optional) -->
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+            <div class="image">
+                <img src="" class="img-circle elevation-2">
+            </div>
+            <div class="info">
+                <a href="#" class="d-block" id="username">Welcome
+                    
+                </a>
+            </div>
+        </div>
+
+        <!-- SidebarSearch Form -->
+        <div class="form-inline">
+            <div class="input-group" data-widget="sidebar-search">
+                <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
+                <div class="input-group-append">
+                    <button class="btn btn-sidebar">
+                        <i class="fas fa-search fa-fw"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Menu -->
+        <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                <li class="nav-item ">
+                    <a class="nav-link" id="dashboard" href="index.html">
+                        <i class="nav-icon fas fa-tachometer-alt"></i>
+                        <p>
+                            Dashboard
+                        </p>
+                    </a>
+                </li>
+
+
+
+<!-- 
+                <li class="nav-item menu-open">
+                    <a class="nav-link active" href="#">
+                        <i class="nav-icon fas fa-users"></i>
+                        <p>
+                            User Management
+                            <i class="fas fa-angle-left right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="users.php" class="nav-link active">
+
+                                <p style="margin-left:2em">Users</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="roles.php" class="nav-link active">
+                                <i class="nav-icon"></i>
+                                <p style="margin-left:2em">Roles</p>
+                            </a>
+                        </li>
+
+
+
+
+                    </ul>
+                </li>
+
+
+
+                <li class="nav-item">
+                    <a href="pos.php" class="nav-link active">
+                        <i class="nav-icon fas fa-money-bill-alt"></i>
+                        <p>POS </p>
+                    </a>
+                </li> -->
+
+
+
+                <!-- </li> -->
+                <li class="nav-item">
+                    <a class="nav-link active" id="suppliers" href="suppliers.html">
+                        <i class="nav-icon fas fa-address-book"></i>
+                        <p></i>Suppliers</p>
+                    </a>
+                </li>
+
+
+
+                <!-- <li class="nav-item menu-open ">
+                    <a href="#" class="nav-link active">
+                        <i class="nav-icon fas fa-money-bill-wave"></i>
+                        <p>
+                            Cash & Bank Account
+                            <i class="fas fa-angle-left right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+
+                        <li class="nav-item">
+                            <a href="bank_accounts.php" class="nav-link active">
+                                <i class="nav-icon"></i>
+                                <p style="margin-left: 2em;">Accounts</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="deposit_bank.php" class="nav-link active">
+                                <i class="nav-icon"></i>
+                                <p style="margin-left: 2em;">Cash to bank</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="view_bank_deposits.php" class="nav-link active">
+                                <i class="nav-icon"></i>
+                                <p style="margin-left: 2em;"> Bank Deposits </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="cash_at_hand.php" class="nav-link active">
+                                <i class="nav-icon"></i>
+                                <p style="margin-left: 2em;">Cash at Hand </p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+-->
+                <li class="nav-item ">
+                    <a href="tanks.html" id="tanks" class="nav-link active">
+                        <i class="nav-icon fas fa-prescription-bottle"></i>
+                        <p>
+                            Storage Tank
+                        </p>
+                    </a>
+
+                </li> 
+
+
+
+                <!-- <li class="nav-item">
+                    <a href="daily_reports.php" class="nav-link active">
+                        <i class="nav-icon fas fa-table"></i>
+                        <p>
+                            My Sales
+                        </p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="pos.php" class="nav-link active">
+                        <i class="nav-icon fas fa-table"></i>
+                        <p>
+                            Revenue Submission
+                        </p>
+                    </a>
+                </li> -->
+
+
+
+                <li class="nav-item">
+                    <a href="sales.html" id ="sales" class="nav-link active">
+                        <i class="nav-icon fas fa-shopping-cart"></i>
+                        <p>
+                            Sales
+                        </p>
+                    </a>
+
+                </li>
+
+
+                <li class="nav-item ">
+                    <a class="nav-link active" id="unpaid" href="unpaid.html">
+                        <i class="nav-icon fas fa-shopping-cart"></i>
+                        <p>
+                            Unpaid
+                        </p>
+                    </a>
+
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" id="revenue_analysis" href="revenue_analysis.html">
+                        <i class="nav-icon fas fa-money-check-alt"></i>
+                        <p>
+                            All Revenue
+                        </p>
+                    </a>
+
+                </li>
+
+
+                <li class="nav-item ">
+                    <a href="purchases.html" id="purchases" class="nav-link active">
+                        <i class="nav-icon fas fa-box"></i>
+                        <p>
+                            Purchase Stock
+
+                        </p>
+                    </a>
+
+                </li>
+
+                <li class="nav-item ">
+                    <a href="expense.html" id="expense" class="nav-link active">
+                        <i class="nav-icon fas fa-box"></i>
+                        <p>
+                           Expenses
+
+                        </p>
+                    </a>
+
+                </li>
+                <li class="nav-item ">
+                    <a href="products.html" id="products" class="nav-link active">
+                        <i class="nav-icon fas fa-box"></i>
+                        <p>
+                           Product Setting
+
+                        </p>
+                    </a>
+
+                </li>
+              
+
+
+
+
+              
+
+                <li class="nav-item">
+
+                    <i class=" nav-icon"></i>
+                    <p style="margin-left:2em"></p>
+
+                </li>
+            </ul>
+        </nav>
+        <!-- /.sidebar-menu -->
+    </div>
+    <!-- /.sidebar -->
+
+<div class="modal fade" id="modal-calculator">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Calculator</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" style="background: linear-gradient(to right, #00AAFF, #00FF6C);">
+                <div class="col-md-12">
+                    <div class="card card-primary">
+                        <div class="card-body">
+                            <div class="calculator-grid">
+                                <div class="output">
+                                    <div data-previous-operand class="previous-operand"></div>
+                                    <div data-current-operand class="current-operand"></div>
+                                </div>
+                                <button data-all-clear class="span-two">AC</button>
+                                <button data-delete>DEL</button>
+                                <button data-operation>/</button>
+                                <button data-number>1</button>
+                                <button data-number>2</button>
+                                <button data-number>3</button>
+                                <button data-operation>*</button>
+                                <button data-number>4</button>
+                                <button data-number>5</button>
+                                <button data-number>6</button>
+                                <button data-operation>+</button>
+                                <button data-number>7</button>
+                                <button data-number>8</button>
+                                <button data-number>9</button>
+                                <button data-operation>-</button>
+                                <button data-number>.</button>
+                                <button data-number>0</button>
+                                <button data-equals class="span-two">=</button>
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                    <!-- /.card -->
+                </div>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+
+    <script>
+
+        var response = "2";
+
+        function handleSelectChange(event) {
+            const selectedValue = event.target.value;
+            document.getElementById("lpg_qty").value = "";
+            document.getElementById("lpg_price").value = "";
+        }
+
+        function handleKeyUp(event) {
+
+            let qty = document.getElementById("lpg_qty").value;
+
+
+            document.getElementById("lpg_price").value = (qty * response).toLocaleString();
+
+
+
+        }
+
+        function handlePriceKeyUp(event) {
+
+            let pri = document.getElementById("lpg_price").value;
+            pri = pri.replace(/,/g, '');
+
+
+            document.getElementById("lpg_qty").value = (pri / response).toFixed(2);
+
+
+
+        }
+
+        function showSelAcc(event) {
+            let selectedValue = event.target.value;
+            let div = document.getElementById('sel_accdiv');
+            let select = document.getElementById('sel_acc');
+
+            if (selectedValue === "Cash") {
+                div.style.display = 'none'; // Hide the div
+                select.removeAttribute('required'); // Remove the required attribute
+            } else {
+                div.style.display = 'block'; // Show the div
+                select.setAttribute('required', ''); // Add the required attribute
+            }
+        }
+    </script>
+
+    </script>
+</div>

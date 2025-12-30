@@ -1,0 +1,285 @@
+<link href="../calc/style.css" rel="stylesheet">
+<script src="../calc/script.js" defer></script>
+
+<style>
+    .sales-button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 15px;
+      font-size: 14px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .sales-button:hover {
+        color: white;
+      background-color: #45a049;
+      transform: scale(1.05);
+    }
+
+    .sales-button:active {
+        color: white;
+      background-color: #3e8e41;
+    }
+</style>
+
+<nav class="main-header navbar navbar-expand navbar-light">
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="modal" data-target="#sell-modal"><img src="img/sell.png"
+                    style="width:60px;cursor:pointer"></a>
+        </li>
+    </ul>
+
+    <!-- Right navbar links -->
+    <ul class="navbar-nav ml-auto text-sm">
+        <li class ="nav-item">
+            <button class="sales-button nav-link" style="color:white" onclick="window.location.href='sales.php'"> Sales </button>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="calc" href="#" role="button" data-toggle="modal" title="Calculator"
+                data-target="#modal-calculator">
+                <i class="fas fa-calculator"></i>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-widget="fullscreen" title="Fullscreen" href="#" role="button">
+                <i class="fas fa-expand-arrows-alt"></i>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="outa.php" title="Logout" onclick="return confirm('Do you want to logout?')">
+                <i class="fas fa-sign-out-alt"></i>
+            </a>
+        </li>
+    </ul>
+</nav>
+
+<aside class="main-sidebar sidebar-dark-primary elevation-4 text-sm">
+    <!-- Brand Logo -->
+    <a href="index.php" style="decoration:none">
+        <div style="margin-top:1em">
+            <img src="img/logo.png" alt="Lorgarts Gas Logo" class="brand-image " style="width: 3.6em;">
+            <span class="font-weight-bold" style="color:white; font-size:1.8em">Lorgarts Gas</span>
+        </div>
+    </a>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <!-- Sidebar user panel -->
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+            <div class="image">
+                <img src="" id="user-photo" class="img-circle elevation-2" alt="User Photo">
+            </div>
+            <div class="info">
+                <a href="#" class="d-block" id="user-welcome">Welcome User</a>
+            </div>
+        </div>
+
+        <!-- SidebarSearch Form -->
+        <div class="form-inline">
+            <div class="input-group" data-widget="sidebar-search">
+                <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
+                <div class="input-group-append">
+                    <button class="btn btn-sidebar">
+                        <i class="fas fa-search fa-fw"></i>
+                    </button>
+                </div>
+            </div>  
+        </div>
+
+        <!-- Sidebar Menu -->
+        <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false" id="sidebar-menu">
+                <!-- Menu items will be dynamically loaded here -->
+            </ul>
+        </nav>
+    </div>
+</aside>
+
+<!-- Calculator Modal -->
+<div class="modal fade" id="modal-calculator">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Calculator</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" style="background: linear-gradient(to right, #00AAFF, #00FF6C);">
+                <div class="col-md-12">
+                    <div class="card card-primary">
+                        <div class="card-body">
+                            <div class="calculator-grid">
+                                <div class="output">
+                                    <div data-previous-operand class="previous-operand"></div>
+                                    <div data-current-operand class="current-operand"></div>
+                                </div>
+                                <button data-all-clear class="span-two">AC</button>
+                                <button data-delete>DEL</button>
+                                <button data-operation>/</button>
+                                <button data-number>1</button>
+                                <button data-number>2</button>
+                                <button data-number>3</button>
+                                <button data-operation>*</button>
+                                <button data-number>4</button>
+                                <button data-number>5</button>
+                                <button data-number>6</button>
+                                <button data-operation>+</button>
+                                <button data-number>7</button>
+                                <button data-number>8</button>
+                                <button data-number>9</button>
+                                <button data-operation>-</button>
+                                <button data-number>.</button>
+                                <button data-number>0</button>
+                                <button data-equals class="span-two">=</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Configuration
+    const API_BASE_URL = 'https://lorgartsgas.hotelsoft.ng/php/'; // Change this to your server URL
+    let lpgPrice = 0;
+
+    // Load user info and menu on page load
+    $(document).ready(function() {
+        loadUserInfo();
+        loadSidebarMenu();
+        loadLPGPrice();
+    });
+
+    // Load user information
+    function loadUserInfo() {
+        $.ajax({
+            url: API_BASE_URL + 'sidebar_api.php',
+            type: 'GET',
+            data: { action: 'get_user_info' },
+            dataType: 'json',
+            success: function(data) {
+                $('#user-photo').attr('src', data.photo);
+                $('#user-welcome').text('Welcome ' + data.username);
+            }
+        });
+    }
+
+    // Load sidebar menu based on user role
+    function loadSidebarMenu() {
+        $.ajax({
+            url: API_BASE_URL + 'sidebar_api.php',
+            type: 'GET',
+            data: { action: 'get_menu' },
+            dataType: 'json',
+            success: function(data) {
+                renderMenu(data.menu);
+            }
+        });
+    }
+
+    // Load LPG price for calculations
+    function loadLPGPrice() {
+        $.ajax({
+            url: API_BASE_URL + 'sidebar_api.php',
+            type: 'GET',
+            data: { action: 'get_lpg_price' },
+            dataType: 'json',
+            success: function(data) {
+                lpgPrice = data.price;
+            }
+        });
+    }
+
+    // Render menu dynamically
+    function renderMenu(menuItems) {
+        let html = '';
+        menuItems.forEach(item => {
+            if (item.children && item.children.length > 0) {
+                // Menu with submenu
+                html += `
+                    <li class="nav-item ${item.active ? 'menu-open' : ''}">
+                        <a href="${item.url}" class="nav-link ${item.active ? 'active' : ''}">
+                            <i class="nav-icon ${item.icon}"></i>
+                            <p>
+                                ${item.label}
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                `;
+                item.children.forEach(child => {
+                    html += `
+                        <li class="nav-item">
+                            <a href="${child.url}" class="nav-link ${child.active ? 'active' : ''}">
+                                <i class="nav-icon"></i>
+                                <p style="margin-left:2em">${child.label}</p>
+                            </a>
+                        </li>
+                    `;
+                });
+                html += `
+                        </ul>
+                    </li>
+                `;
+            } else {
+                // Single menu item
+                html += `
+                    <li class="nav-item">
+                        <a href="${item.url}" class="nav-link ${item.active ? 'active' : ''}">
+                            <i class="nav-icon ${item.icon}"></i>
+                            <p>${item.label}</p>
+                        </a>
+                    </li>
+                `;
+            }
+        });
+        $('#sidebar-menu').html(html);
+    }
+
+    // LPG quantity and price calculations
+    function handleSelectChange(event) {
+        const selectedValue = event.target.value;
+        document.getElementById("lpg_qty").value = "";
+        document.getElementById("lpg_price").value = "";
+    }
+
+    function handleKeyUp(event) {
+        let qty = document.getElementById("lpg_qty").value;
+        if (qty && lpgPrice) {
+            document.getElementById("lpg_price").value = (qty * lpgPrice).toLocaleString();
+        }
+    }
+
+    function handlePriceKeyUp(event) {
+        let pri = document.getElementById("lpg_price").value;
+        pri = pri.replace(/,/g, '');
+        if (pri && lpgPrice) {
+            document.getElementById("lpg_qty").value = (pri / lpgPrice).toFixed(2);
+        }
+    }
+
+    function showSelAcc(event) {
+        let selectedValue = event.target.value;
+        let div = document.getElementById('sel_accdiv');
+        let select = document.getElementById('sel_acc');
+
+        if (selectedValue === "Cash") {
+            div.style.display = 'none';
+            select.removeAttribute('required');
+        } else {
+            div.style.display = 'block';
+            select.setAttribute('required', '');
+        }
+    }
+</script>
