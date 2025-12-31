@@ -256,7 +256,7 @@ function loadProductPrice(productId) {
             if (response.status === 'success') {
                 $('#unit_pricefill').val(response.price);
             } else {
-                alert(response.msg);
+                //alert(response.msg);
             }
         },
         error: function () {
